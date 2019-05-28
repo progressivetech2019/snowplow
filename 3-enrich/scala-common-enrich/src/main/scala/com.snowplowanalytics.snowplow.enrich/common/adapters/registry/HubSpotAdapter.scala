@@ -27,7 +27,6 @@ import com.snowplowanalytics.iglu.core.{SchemaKey, SchemaVer}
 import io.circe._
 import org.joda.time.DateTime
 
-import loaders.CollectorPayload
 import outputs._
 import utils.JsonUtils
 

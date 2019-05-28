@@ -144,7 +144,7 @@ object EnrichmentRegistry {
             enrichment <- c.enrichment[F]
             registry <- er
           } yield registry.copy(uaParser = enrichment.some)
-        case c: UserAgentUtilsConf.type => er.map(_.copy(userAgentUtils = c.enrichment.some))
+        case c: UserAgentUtilsConf => er.map(_.copy(userAgentUtils = c.enrichment.some))
         case c: WeatherConf =>
           for {
             enrichment <- c.enrichment[F]
@@ -239,6 +239,6 @@ final case class EnrichmentRegistry[F[_]](
   javascriptScript: Option[JavascriptScriptEnrichment] = None,
   refererParser: Option[RefererParserEnrichment] = None,
   uaParser: Option[UaParserEnrichment] = None,
-  userAgentUtils: Option[UserAgentUtilsEnrichment.type] = None,
+  userAgentUtils: Option[UserAgentUtilsEnrichment] = None,
   weather: Option[WeatherEnrichment[F]] = None
 )

@@ -26,7 +26,6 @@ import com.snowplowanalytics.iglu.core.{SchemaKey, SchemaVer}
 import io.circe._
 import org.apache.http.NameValuePair
 
-import loaders.CollectorPayload
 import outputs._
 import utils.JsonUtils
 

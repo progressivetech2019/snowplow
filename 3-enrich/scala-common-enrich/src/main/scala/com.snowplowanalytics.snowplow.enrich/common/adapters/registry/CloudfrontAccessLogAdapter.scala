@@ -28,7 +28,7 @@ import com.snowplowanalytics.iglu.client.resolver.registries.RegistryLookup
 import io.circe._
 import org.joda.time.DateTime
 
-import loaders.{CollectorContext, CollectorPayload}
+import loaders.CollectorContext
 import outputs._
 import utils.ConversionUtils
 

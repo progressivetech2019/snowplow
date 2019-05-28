@@ -31,7 +31,6 @@ import io.circe._
 import io.circe.syntax._
 import org.apache.http.client.utils.URLEncodedUtils
 
-import loaders.CollectorPayload
 import outputs._
 import utils.ConversionUtils._
 

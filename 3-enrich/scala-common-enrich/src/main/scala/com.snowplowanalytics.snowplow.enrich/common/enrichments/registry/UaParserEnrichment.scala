@@ -14,6 +14,7 @@ package enrichments.registry
 
 import java.io.{FileInputStream, InputStream}
 import java.net.URI
+import java.util.UUID
 
 import cats.{Eval, Monad}
 import cats.data.{EitherT, NonEmptyList, ValidatedNel}
@@ -32,7 +33,6 @@ import utils.CirceUtils
 object UaParserEnrichment extends ParseableEnrichment {
   override val supportedSchema =
     SchemaCriterion("com.snowplowanalytics.snowplow", "ua_parser_config", "jsonschema", 1, 0)
-
   private val localFile = "./ua-parser-rules.yml"
 
   override def parse(
@@ -43,7 +43,7 @@ object UaParserEnrichment extends ParseableEnrichment {
     (for {
       _ <- isParseable(c, schemaKey).leftMap(NonEmptyList.one)
       rules <- getCustomRules(c).toEither
-    } yield UaParserConf(rules)).toValidated
+    } yield UaParserConf(schemaKey, rules)).toValidated
 
   /**
    * Creates a UaParserEnrichment from a UaParserConf
@@ -54,7 +54,7 @@ object UaParserEnrichment extends ParseableEnrichment {
     conf: UaParserConf
   ): EitherT[F, String, UaParserEnrichment] =
     EitherT(CreateUaParser[F].create(conf.uaDatabase.map(_._2)))
-      .map(UaParserEnrichment.apply)
+      .map(p => UaParserEnrichment(conf.schemaKey, p))
 
   private def getCustomRules(conf: Json): ValidatedNel[String, Option[(URI, String)]] =
     if (conf.hcursor.downField("parameters").downField("uri").focus.isDefined) {
@@ -71,7 +71,9 @@ object UaParserEnrichment extends ParseableEnrichment {
 }
 
 /** Config for an ua_parser_config enrichment. Uses uap-java library to parse client attributes */
-final case class UaParserEnrichment(parser: Parser) extends Enrichment {
+final case class UaParserEnrichment(schemaKey: SchemaKey, parser: Parser) extends Enrichment {
+  private val enrichmentInfo =
+    EnrichmentInformation(schemaKey, s"ua-parser-${UUID.randomUUID}").some
 
   /** Adds a period in front of a not-null version element */
   def prependDot(versionElement: String): String =
@@ -102,15 +104,14 @@ final case class UaParserEnrichment(parser: Parser) extends Enrichment {
    * @param useragent to extract from. Should be encoded, i.e. not previously decoded.
    * @return the json or the message of the exception, boxed in a Scalaz Validation
    */
-  def extractUserAgent(useragent: String): Either[EnrichmentFailureMessage, Json] =
+  def extractUserAgent(useragent: String): Either[EnrichmentStageIssue, Json] =
     Either
       .catchNonFatal(parser.parse(useragent))
-      .leftMap(
-        e =>
-          SimpleEnrichmentFailureMessage(
-            s"Exception parsing useragent [$useragent]: [${e.getMessage}]"
-          )
-      )
+      .leftMap { e =>
+        val msg = s"could not parse useragent: ${e.getMessage}"
+        val f = InputDataEnrichmentFailureMessage("useragent", useragent.some, msg)
+        EnrichmentFailure(enrichmentInfo, f)
+      }
       .map(assembleContext)
 
   /** Assembles ua_parser_context from a parsed user agent. */

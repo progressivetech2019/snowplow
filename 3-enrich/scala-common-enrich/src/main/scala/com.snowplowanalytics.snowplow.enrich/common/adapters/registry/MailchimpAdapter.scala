@@ -33,7 +33,6 @@ import org.apache.http.client.utils.URLEncodedUtils
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 
-import loaders.CollectorPayload
 import outputs._
 import utils.{JsonUtils => JU}
 

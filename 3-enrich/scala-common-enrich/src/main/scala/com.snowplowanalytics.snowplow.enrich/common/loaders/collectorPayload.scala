@@ -15,44 +15,9 @@ package loaders
 
 import cats.syntax.either._
 import cats.syntax.option._
-import org.apache.http.NameValuePair
 import org.joda.time.DateTime
 
 import outputs._
-
-object CollectorPayload {
-
-  /**
-   * A constructor version to use. Supports legacy tp1 (where no API vendor or version provided
-   * as well as Snowplow).
-   */
-  def apply(
-    querystring: List[NameValuePair],
-    sourceName: String,
-    sourceEncoding: String,
-    sourceHostname: Option[String],
-    contextTimestamp: Option[DateTime],
-    contextIpAddress: Option[String],
-    contextUseragent: Option[String],
-    contextRefererUri: Option[String],
-    contextHeaders: List[String],
-    contextUserId: Option[String],
-    api: CollectorApi,
-    contentType: Option[String],
-    body: Option[String]
-  ): CollectorPayload = {
-    val source = CollectorSource(sourceName, sourceEncoding, sourceHostname)
-    val context = CollectorContext(
-      contextTimestamp,
-      contextIpAddress,
-      contextUseragent,
-      contextRefererUri,
-      contextHeaders,
-      contextUserId
-    )
-    CollectorPayload(api, querystring, contentType, body, source, context)
-  }
-}
 
 object CollectorApi {
 
@@ -109,16 +74,3 @@ final case class CollectorContext(
 
 /** Define the vendor and version of the payload. */
 final case class CollectorApi(vendor: String, version: String)
-
-/**
- * The canonical input format for the ETL process: it should be possible to convert any collector
- * input format to this format, ready for the main, collector-agnostic stage of the ETL.
- */
-final case class CollectorPayload(
-  api: CollectorApi,
-  querystring: List[NameValuePair], // Could be empty in future trackers
-  contentType: Option[String], // Not always set
-  body: Option[String], // Not set for GETs
-  source: CollectorSource,
-  context: CollectorContext
-)

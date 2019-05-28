@@ -35,7 +35,6 @@ import io.circe.optics.JsonPath._
 import org.apache.http.client.utils.URLEncodedUtils
 import org.joda.time.DateTime
 
-import loaders.CollectorPayload
 import outputs._
 import utils.{JsonUtils => JU}
 

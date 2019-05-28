@@ -25,7 +25,6 @@ import com.snowplowanalytics.iglu.client.resolver.registries.RegistryLookup
 import com.snowplowanalytics.iglu.core.{SchemaKey, SchemaVer}
 import io.circe._
 
-import loaders.CollectorPayload
 import outputs._
 import utils.JsonUtils
 

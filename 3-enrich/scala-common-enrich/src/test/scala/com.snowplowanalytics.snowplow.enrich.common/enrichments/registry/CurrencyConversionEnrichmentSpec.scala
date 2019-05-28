@@ -18,6 +18,7 @@ import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import cats.syntax.validated._
 import com.snowplowanalytics.forex.CreateForex._
 import com.snowplowanalytics.forex.model._
+import com.snowplowanalytics.iglu.core.{SchemaKey, SchemaVer}
 import org.joda.money.CurrencyUnit
 import org.joda.time.DateTime
 import org.specs2.Specification
@@ -67,6 +68,7 @@ class CurrencyConversionEnrichmentSpec extends Specification with DataTables {
     "Open Exchange Rates error, type: [OtherErrors], message: [invalid_app_id]"
   ).invalidNel
   val coTstamp: DateTime = new DateTime(2011, 3, 13, 0, 0)
+  val schemaKey = SchemaKey("vendor", "name", "format", SchemaVer.Full(1, 0, 0))
 
   def e1 =
     "SPEC NAME" || "TRANSACTION CURRENCY" | "API KEY" | "TOTAL AMOUNT" | "TOTAL TAX" | "SHIPPING" | "TRANSACTION ITEM CURRENCY" | "TRANSACTION ITEM PRICE" | "DATETIME" | "CONVERTED TUPLE" |
@@ -92,7 +94,8 @@ class CurrencyConversionEnrichmentSpec extends Specification with DataTables {
         expected
       ) =>
         (for {
-          e <- CurrencyConversionConf(DeveloperAccount, apiKey, CurrencyUnit.EUR).enrichment[Eval]
+          e <- CurrencyConversionConf(schemaKey, DeveloperAccount, apiKey, CurrencyUnit.EUR)
+            .enrichment[Eval]
           res <- e.convertCurrencies(
             trCurrency,
             trAmountTotal,
@@ -157,7 +160,9 @@ class CurrencyConversionEnrichmentSpec extends Specification with DataTables {
         expected
       ) =>
         (for {
-          c <- Eval.now(CurrencyConversionConf(DeveloperAccount, apiKey, CurrencyUnit.EUR))
+          c <- Eval.now(
+            CurrencyConversionConf(schemaKey, DeveloperAccount, apiKey, CurrencyUnit.EUR)
+          )
           e <- c.enrichment[Eval]
           res <- e.convertCurrencies(
             trCurrency,

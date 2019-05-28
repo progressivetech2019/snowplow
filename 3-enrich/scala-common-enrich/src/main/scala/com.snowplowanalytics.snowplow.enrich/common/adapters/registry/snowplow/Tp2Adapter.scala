@@ -26,7 +26,6 @@ import com.snowplowanalytics.iglu.core.{SchemaCriterion, SelfDescribingData}
 import com.snowplowanalytics.iglu.core.circe.instances._
 import io.circe.Json
 
-import loaders.CollectorPayload
 import outputs._
 import utils.{JsonUtils => JU}
 

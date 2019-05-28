@@ -31,7 +31,6 @@ import org.apache.http.NameValuePair
 import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.DateTimeFormat
 
-import loaders.CollectorPayload
 import outputs._
 import utils.{JsonUtils => JU}
 

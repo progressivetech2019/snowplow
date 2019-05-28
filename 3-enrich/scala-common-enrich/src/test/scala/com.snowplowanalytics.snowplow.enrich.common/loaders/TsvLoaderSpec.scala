@@ -10,11 +10,14 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package com.snowplowanalytics.snowplow.enrich.common.loaders
+package com.snowplowanalytics.snowplow.enrich.common
+package loaders
 
 import cats.syntax.option._
 import org.specs2.Specification
 import org.specs2.matcher.{DataTables, ValidatedMatchers}
+
+import outputs.CollectorPayload
 
 class TsvLoaderSpec extends Specification with DataTables with ValidatedMatchers {
   def is = s2"""
@@ -32,13 +35,13 @@ class TsvLoaderSpec extends Specification with DataTables with ValidatedMatchers
       source = CollectorSource("tsv", "UTF-8", None),
       context = CollectorContext(None, None, None, None, Nil, None)
     )
-    TsvLoader("com.amazon.aws.cloudfront/wd_access_log").toCollectorPayload("a\tb") must beValid(
+    TsvLoader("com.amazon.aws.cloudfront/wd_access_log").toCP("a\tb") must beValid(
       expected.some
     )
   }
 
   def e2 =
-    TsvLoader("com.amazon.aws.cloudfront/wd_access_log").toCollectorPayload("#Version: 1.0") must beValid(
+    TsvLoader("com.amazon.aws.cloudfront/wd_access_log").toCP("#Version: 1.0") must beValid(
       None
     )
 }
